@@ -20,4 +20,14 @@ public class ClienteTest {
 		Assert.assertTrue(conteudo.contains("<rua>Rua Vergueiro"));
 	}
 	
+	@Test
+	public void testaQueResourceProjetosRetornaOPrimeiroProjeto() {
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://localhost:8080");
+		
+		String conteudo = target.path("/projetos").request().get(String.class);
+		
+		Assert.assertTrue(conteudo.contains("<nome>Minha loja"));
+	}
+	
 }
