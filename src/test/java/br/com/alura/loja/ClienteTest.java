@@ -23,6 +23,7 @@ import junit.framework.Assert;
 public class ClienteTest {
 
 	private HttpServer servidor;
+	private Client client;
 
 	@Before
 	public void iniciaServidor() throws URISyntaxException {
@@ -36,7 +37,7 @@ public class ClienteTest {
 	
 	@Test
 	public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperado() {
-		Client client = ClientBuilder.newClient();
+		this.client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		
 		String conteudo = target.path("/carrinhos/1").request().get(String.class);
@@ -47,7 +48,7 @@ public class ClienteTest {
 	
 	@Test
 	public void testaAdicionarUmCarrinho() {
-		Client client = ClientBuilder.newClient();
+		this.client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		
 		Carrinho carrinho = new Carrinho();
@@ -61,7 +62,14 @@ public class ClienteTest {
         
         Response response = target.path("/carrinhos").request().post(entity);
         
-        Assert.assertEquals("<status>Sucesso</status>", response.readEntity(String.class));
+        Assert.assertEquals(201, response.getStatus());
+        
+        String location = response.getHeaderString("Location");
+        
+        String conteudo = client.target(location).request().get(String.class);
+        
+        Assert.assertTrue(conteudo.contains("Tablet"));
+        
         
         
 	}
