@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thoughtworks.xstream.XStream;
+import com.google.gson.Gson;
 
 import br.com.alura.loja.modelo.Carrinho;
 import junit.framework.Assert;
@@ -36,7 +36,7 @@ public class ClienteTest {
 		WebTarget target = client.target("http://localhost:8080");
 		
 		String conteudo = target.path("/carrinhos/1").request().get(String.class);
-		Carrinho carrinho = (Carrinho) new XStream().fromXML(conteudo);
+		Carrinho carrinho = new Gson().fromJson(conteudo, Carrinho.class);
 		
 		Assert.assertEquals("Rua Vergueiro 3185, 8 andar", carrinho.getRua());
 	}
