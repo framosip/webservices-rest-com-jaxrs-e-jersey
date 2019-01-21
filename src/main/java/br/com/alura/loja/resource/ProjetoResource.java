@@ -17,7 +17,7 @@ public class ProjetoResource {
 	@Produces(MediaType.APPLICATION_ATOM_XML)
 	public String busca(@PathParam("id") long id) {
 		Projeto busca = new ProjetoDAO().busca(id);
-		return busca.toXML();
+		return busca.toJSON();
 	}
 	
 }
