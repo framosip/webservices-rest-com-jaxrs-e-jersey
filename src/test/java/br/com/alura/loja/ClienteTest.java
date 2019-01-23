@@ -10,6 +10,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,11 @@ public class ClienteTest {
 	@Before
 	public void iniciaServidor() throws URISyntaxException {
 		servidor = Servidor.iniciaServidor();
+		
+		ClientConfig config = new ClientConfig();
+		config.register(new LoggingFilter());
+		
+		this.client = ClientBuilder.newClient(config);
 	}
 	
 	@After
@@ -38,7 +45,6 @@ public class ClienteTest {
 	
 	@Test
 	public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperado() {
-		this.client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		
 		String conteudo = target.path("/carrinhos/1").request().get(String.class);
@@ -49,7 +55,6 @@ public class ClienteTest {
 	
 	@Test
 	public void testaAdicionarUmCarrinho() {
-		this.client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		
 		Carrinho carrinho = new Carrinho();
@@ -75,7 +80,6 @@ public class ClienteTest {
 	
 	@Test
 	public void testaQueProdutoFoiRemovido() {
-		this.client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:8080");
 		
 		Response response = target.path("/carrinhos/1/remover/6237").request().delete();
