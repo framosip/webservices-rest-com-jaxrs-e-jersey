@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
 
+import br.com.alura.loja.dao.CarrinhoDAO;
 import br.com.alura.loja.modelo.Carrinho;
 import br.com.alura.loja.modelo.Produto;
 import junit.framework.Assert;
@@ -70,8 +71,29 @@ public class ClienteTest {
         
         Assert.assertTrue(conteudo.contains("Tablet"));
         
-        
-        
+	}
+	
+	@Test
+	public void testaQueProdutoFoiRemovido() {
+		this.client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://localhost:8080");
+		
+		Response response = target.path("/carrinhos/1/remover/6237").request().delete();
+		
+		Assert.assertEquals(200, response.getStatus());
+		
+		Carrinho carrinho = new CarrinhoDAO().busca(1l);
+		
+		boolean naoExiste = true;
+		
+		for (Produto p : carrinho.getProdutos()) {
+			if(p.getId() == 6237)
+				naoExiste = false;
+		}
+		
+		Assert.assertTrue(naoExiste);
+		
+		
 	}
 	
 }
