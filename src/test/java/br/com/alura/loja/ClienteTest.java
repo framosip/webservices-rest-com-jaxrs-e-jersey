@@ -47,9 +47,7 @@ public class ClienteTest {
 	@Test
 	public void testaQueBuscarUmCarrinhoTrazOCarrinhoEsperado() {
 		WebTarget target = client.target("http://localhost:8080");
-		
-		String conteudo = target.path("/carrinhos/1").request().get(String.class);
-		Carrinho carrinho = (Carrinho) new XStream().fromXML(conteudo);
+		Carrinho carrinho = target.path("/carrinhos/1").request().get(Carrinho.class);
 		
 		Assert.assertEquals("Rua Vergueiro 3185, 8 andar", carrinho.getRua());
 	}
@@ -58,14 +56,14 @@ public class ClienteTest {
 	public void testaAdicionarUmCarrinho() {
 		WebTarget target = client.target("http://localhost:8080");
 		
+		Produto produto = new Produto(314L, "Tablet", 999, 1);
+		
 		Carrinho carrinho = new Carrinho();
-		carrinho.adiciona(new Produto(314L, "Tablet", 999, 1));
+		carrinho.adiciona(produto);
         carrinho.setRua("Rua Vergueiro");
         carrinho.setCidade("Sao Paulo");
-        
-        String xml = carrinho.toXML();
-        
-        Entity<String> entity = Entity.entity(xml, MediaType.APPLICATION_XML);
+                
+        Entity<Carrinho> entity = Entity.entity(carrinho, MediaType.APPLICATION_XML);
         
         Response response = target.path("/carrinhos").request().post(entity);
         
@@ -73,9 +71,9 @@ public class ClienteTest {
         
         String location = response.getHeaderString("Location");
         
-        String conteudo = client.target(location).request().get(String.class);
+        Carrinho carrinhoNovo = client.target(location).request().get(Carrinho.class);
         
-        Assert.assertTrue(conteudo.contains("Tablet"));
+        Assert.assertTrue(carrinhoNovo.getProdutos().contains(produto));
         
 	}
 	
@@ -103,9 +101,9 @@ public class ClienteTest {
 	public void testaAlteracaoDeUmProdutoInteiro() {
 		WebTarget target = client.target("http://localhost:8080");
 
-		String produtoNovo = "<br.com.alura.loja.modelo.Produto><preco>60.0</preco><id>3467</id><nome>Jogo de esporte</nome><quantidade>1</quantidade></br.com.alura.loja.modelo.Produto>";
+		Produto produto = new Produto(3467, "Jogo de esporte", 60.0, 1);
 		
-		Entity<String> entity = Entity.entity(produtoNovo, MediaType.APPLICATION_XML);
+		Entity<Produto> entity = Entity.entity(produto, MediaType.APPLICATION_XML);
 		
 		Response response = target.path("/carrinhos/1/produtos/3467").request().put(entity);
 		
@@ -114,9 +112,9 @@ public class ClienteTest {
 		Carrinho carrinho = new CarrinhoDAO().busca(1l);
 		List<Produto> produtos = carrinho.getProdutos();
 		
-		for (Produto produto : produtos) {
-			if(produto.getId() == 3467) {
-				Assert.assertEquals(1, produto.getQuantidade());
+		for (Produto p : produtos) {
+			if(p.getId() == 3467) {
+				Assert.assertEquals(1, p.getQuantidade());
 			}
 		}
 		
@@ -126,9 +124,9 @@ public class ClienteTest {
 	public void testaAlteracaoApenasDaQuantidadeDeUmProduto() {
 		WebTarget target = client.target("http://localhost:8080");
 
-		String produtoNovo = "<br.com.alura.loja.modelo.Produto><id>3467</id><quantidade>8</quantidade></br.com.alura.loja.modelo.Produto>";
+		Produto produto = new Produto(3467, "Jogo de esporte", 60.0, 8);
 		
-		Entity<String> entity = Entity.entity(produtoNovo, MediaType.APPLICATION_XML);
+		Entity<Produto> entity = Entity.entity(produto, MediaType.APPLICATION_XML);
 		
 		Response response = target.path("/carrinhos/1/produtos/3467/quantidade").request().put(entity);
 		
@@ -137,9 +135,9 @@ public class ClienteTest {
 		Carrinho carrinho = new CarrinhoDAO().busca(1l);
 		List<Produto> produtos = carrinho.getProdutos();
 		
-		for (Produto produto : produtos) {
-			if(produto.getId() == 3467) {
-				Assert.assertEquals(8, produto.getQuantidade());
+		for (Produto p : produtos) {
+			if(p.getId() == 3467) {
+				Assert.assertEquals(8, p.getQuantidade());
 			}
 		}
 		
