@@ -17,8 +17,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thoughtworks.xstream.XStream;
-
 import br.com.alura.loja.dao.CarrinhoDAO;
 import br.com.alura.loja.modelo.Carrinho;
 import br.com.alura.loja.modelo.Produto;
