@@ -1,6 +1,7 @@
 package br.com.alura.loja;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -82,7 +83,7 @@ public class ClienteTest {
 	public void testaQueProdutoFoiRemovido() {
 		WebTarget target = client.target("http://localhost:8080");
 		
-		Response response = target.path("/carrinhos/1/remover/6237").request().delete();
+		Response response = target.path("/carrinhos/1/produtos/6237").request().delete();
 		
 		Assert.assertEquals(200, response.getStatus());
 		
@@ -96,8 +97,54 @@ public class ClienteTest {
 		}
 		
 		Assert.assertTrue(naoExiste);
+	}
+	
+	@Test
+	public void testaAlteracaoDeUmProdutoInteiro() {
+		WebTarget target = client.target("http://localhost:8080");
+
+		String produtoNovo = "<br.com.alura.loja.modelo.Produto><preco>60.0</preco><id>3467</id><nome>Jogo de esporte</nome><quantidade>1</quantidade></br.com.alura.loja.modelo.Produto>";
 		
+		Entity<String> entity = Entity.entity(produtoNovo, MediaType.APPLICATION_XML);
+		
+		Response response = target.path("/carrinhos/1/produtos/3467").request().put(entity);
+		
+		Assert.assertEquals(200, response.getStatus());
+		
+		Carrinho carrinho = new CarrinhoDAO().busca(1l);
+		List<Produto> produtos = carrinho.getProdutos();
+		
+		for (Produto produto : produtos) {
+			if(produto.getId() == 3467) {
+				Assert.assertEquals(1, produto.getQuantidade());
+			}
+		}
 		
 	}
+	
+	@Test
+	public void testaAlteracaoApenasDaQuantidadeDeUmProduto() {
+		WebTarget target = client.target("http://localhost:8080");
+
+		String produtoNovo = "<br.com.alura.loja.modelo.Produto><id>3467</id><quantidade>8</quantidade></br.com.alura.loja.modelo.Produto>";
+		
+		Entity<String> entity = Entity.entity(produtoNovo, MediaType.APPLICATION_XML);
+		
+		Response response = target.path("/carrinhos/1/produtos/3467/quantidade").request().put(entity);
+		
+		Assert.assertEquals(200, response.getStatus());
+		
+		Carrinho carrinho = new CarrinhoDAO().busca(1l);
+		List<Produto> produtos = carrinho.getProdutos();
+		
+		for (Produto produto : produtos) {
+			if(produto.getId() == 3467) {
+				Assert.assertEquals(8, produto.getQuantidade());
+			}
+		}
+		
+	}	
+	
+
 	
 }
